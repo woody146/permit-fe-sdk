@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosHeaders } from 'axios';
 
 import { generateStateKey, getBulkPermissionFromBE, getPermissionFromBE } from '../service';
 import { permitState } from '..';
@@ -102,9 +102,9 @@ describe('Permission Service', () => {
 
     it('should forward headers when supplied', async () => {
       mockedAxios.post.mockResolvedValueOnce({ data: [true] });
-      await getBulkPermissionFromBE('http://example.com', 'user1', [{ action: 'read', resource: { type: 'member_group', key: 'group1' } }], {
+      await getBulkPermissionFromBE('http://example.com', 'user1', [{ action: 'read', resource: { type: 'member_group', key: 'group1' } }], new AxiosHeaders({
         Authorization: 'Bearer token123',
-      });
+      }));
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
         'http://example.com?user=user1',
@@ -141,7 +141,7 @@ describe('Permission Service', () => {
         'http://example.com',
         'user1',
         [{ action: 'read', resource: { type: 'member_group', key: 'group1' } }],
-        { Authorization: 'Bearer token123' },
+        new AxiosHeaders({ Authorization: 'Bearer token123' }),
         { withCredentials: true, timeout: 5000 },
       );
 
@@ -176,7 +176,7 @@ describe('Permission Service', () => {
 
     it('should forward headers when supplied', async () => {
       mockedAxios.get.mockResolvedValueOnce({ data: { permitted: true } });
-      await getPermissionFromBE('http://example.com', 'user1', 'read', { type: 'member_group', key: 'group1' }, true, { Authorization: 'Bearer token123' });
+      await getPermissionFromBE('http://example.com', 'user1', 'read', { type: 'member_group', key: 'group1' }, true, new AxiosHeaders({ Authorization: 'Bearer token123' }));
 
       expect(mockedAxios.get).toHaveBeenCalledWith('http://example.com?user=user1&action=read&resource=member_group:group1', {
         headers: { Authorization: 'Bearer token123' },
@@ -201,7 +201,7 @@ describe('Permission Service', () => {
         'read',
         { type: 'member_group', key: 'group1' },
         true,
-        { Authorization: 'Bearer token123' },
+        new AxiosHeaders({ Authorization: 'Bearer token123' }),
         { withCredentials: true, timeout: 5000 },
       );
 
